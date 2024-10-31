@@ -1,12 +1,30 @@
 from fastapi import FastAPI
 from app.routes import router
-from pydantic import BaseModel, Field
-from datetime import date
+from app.models import (
+    
+    ProveedorCreate, Proveedor,
+    ProductoCreate, Producto,
+    CategoriaCreate, Categoria,
+    ClienteCreate, Cliente,
+    EntradaInventarioCreate, EntradaInventario,
+    SalidaInventarioCreate, SalidaInventario,
+    
+    
+    ProductoResponse,
+    InventarioResponse,
+    MovimientoInventario,
+    ResumenProveedor,
+    VentasPorPeriodo,
+    ProductoMasVendido,
+    
+    
+    FiltroInventario,
+    FiltroVentas
+)
 
-# Esta clase ya se ha definido en models.py, por lo que se puede eliminar de aquí.
-# Si es necesario usarla, se debe importar desde models.py
-from app.models import CourseCreate
+app = FastAPI(title="Tecnology Store API",)
 
-app = FastAPI()
 
+# Incluir el router
 app.include_router(router)
+
