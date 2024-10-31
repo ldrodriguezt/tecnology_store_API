@@ -1,12 +1,52 @@
 from fastapi import FastAPI
 from app.routes import router
-from pydantic import BaseModel, Field
-from datetime import date
+from app.models import (
+    # Modelos base
+    ProveedorCreate, Proveedor,
+    ProductoCreate, Producto,
+    CategoriaCreate, Categoria,
+    ClienteCreate, Cliente,
+    EntradaInventarioCreate, EntradaInventario,
+    SalidaInventarioCreate, SalidaInventario,
+    
+    # Modelos de respuesta
+    ProductoResponse,
+    InventarioResponse,
+    MovimientoInventario,
+    ResumenProveedor,
+    VentasPorPeriodo,
+    ProductoMasVendido,
+    
+    # Modelos de filtros
+    FiltroInventario,
+    FiltroVentas
+)
 
-# Esta clase ya se ha definido en models.py, por lo que se puede eliminar de aquí.
-# Si es necesario usarla, se debe importar desde models.py
-from app.models import CourseCreate
+app = FastAPI(
+    title="Tecnology Store API",
+    description="API para gestión de inventario de tienda tecnológica",
+    version="1.0.0"
+)
 
-app = FastAPI()
+# Configuración de CORS si es necesario
+from fastapi.middleware.cors import CORSMiddleware
 
-app.include_router(router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configura según tus necesidades
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Incluir el router
+app.include_router(router, prefix="/api/v1")
+
+# Ruta raíz
+@app.get("/")
+async def root():
+    return {
+        "message": "Bienvenido a la API de Tecnology Store",
+        "documentacion": "/docs"
+    }
+
