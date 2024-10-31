@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.models import *
 from app.database import get_db_connection
 from typing import List
-
+from datetime import datetime
 
 router = APIRouter()
 
@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/productos/", response_model=Producto)
 async def crear_producto(producto: ProductoCreate):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         # Verificar si existe la categoría
@@ -38,7 +38,7 @@ async def crear_producto(producto: ProductoCreate):
 @router.get("/productos/", response_model=List[ProductoResponse])
 async def listar_productos(stock_minimo: int = None, categoria_id: int = None):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         query = """
@@ -68,7 +68,7 @@ async def listar_productos(stock_minimo: int = None, categoria_id: int = None):
 @router.post("/inventario/entradas/", response_model=EntradaInventario)
 async def registrar_entrada(entrada: EntradaInventarioCreate):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         # Verificar si existe el producto
@@ -106,7 +106,7 @@ async def registrar_entrada(entrada: EntradaInventarioCreate):
 @router.post("/inventario/salidas/", response_model=SalidaInventario)
 async def registrar_salida(salida: SalidaInventarioCreate):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         # Verificar stock disponible
@@ -152,7 +152,7 @@ async def obtener_movimientos(
     fecha_fin: Optional[datetime] = None
 ):
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     
     try:
         query = """
