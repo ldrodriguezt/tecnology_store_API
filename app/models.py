@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 from decimal import Decimal
 
-# Modelos base para Proveedor
+
 class ProveedorCreate(BaseModel):
     nombre: str = Field(..., max_length=100)
     telefono: str = Field(..., max_length=15)
@@ -12,7 +12,7 @@ class ProveedorCreate(BaseModel):
 class Proveedor(ProveedorCreate):
     id_proveedor: int
 
-# Modelos base para Producto
+
 class ProductoCreate(BaseModel):
     nombre: str = Field(..., max_length=100)
     descripcion: str
@@ -23,14 +23,14 @@ class ProductoCreate(BaseModel):
 class Producto(ProductoCreate):
     id_producto: int
 
-# Modelos base para Categoria
+
 class CategoriaCreate(BaseModel):
     nombre: str = Field(..., max_length=100)
 
 class Categoria(CategoriaCreate):
     id_categoria: int
 
-# Modelos base para Cliente
+
 class ClienteCreate(BaseModel):
     nombre: str = Field(..., max_length=100)
     correo: str = Field(..., max_length=100)
@@ -39,7 +39,7 @@ class ClienteCreate(BaseModel):
 class Cliente(ClienteCreate):
     id_cliente: int
 
-# Modelos base para movimientos de inventario
+
 class SalidaInventarioCreate(BaseModel):
     fecha: datetime
     id_producto: int
@@ -60,7 +60,7 @@ class EntradaInventarioCreate(BaseModel):
 class EntradaInventario(EntradaInventarioCreate):
     id_entrada: int
 
-# Modelos para consultas y respuestas específicas
+
 class ProductoResponse(Producto):
     categoria_nombre: str
     stock_disponible: int
@@ -109,7 +109,7 @@ class ProductoMasVendido(BaseModel):
         }
     )
 
-# Modelos para filtros y búsquedas
+
 class FiltroInventario(BaseModel):
     categoria_id: Optional[int]
     stock_minimo: Optional[int]

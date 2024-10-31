@@ -6,14 +6,14 @@ from datetime import datetime
 
 router = APIRouter()
 
-# 1. RUTAS DE CATEGORÍAS (Entidad base)
+
 @router.post("/categorias/", response_model=Categoria)
 async def crear_categoria(categoria: CategoriaCreate):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificar si ya existe la categoría
+        
         cursor.execute("SELECT id_categoria FROM categorias WHERE nombre = %s", 
                       (categoria.nombre,))
         if cursor.fetchone():
@@ -39,7 +39,7 @@ async def crear_categorias_bulk(categorias: List[CategoriaCreate]):
     try:
         for categoria in categorias:
             try:
-                # Verificar si ya existe una categoría con el mismo nombre
+                
                 cursor.execute("SELECT id_categoria FROM categorias WHERE nombre = %s", 
                              (categoria.nombre,))
                 if cursor.fetchone():
@@ -86,14 +86,14 @@ async def listar_categorias():
         cursor.close()
         conn.close()
 
-# 2. RUTAS DE PROVEEDORES (Entidad base)
+
 @router.post("/proveedores/", response_model=Proveedor)
 async def crear_proveedor(proveedor: ProveedorCreate):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificar si ya existe el proveedor
+        
         cursor.execute("SELECT id_proveedor FROM proveedores WHERE nombre = %s AND telefono = %s", 
                       (proveedor.nombre, proveedor.telefono))
         if cursor.fetchone():
@@ -126,14 +126,14 @@ async def listar_proveedores():
         cursor.close()
         conn.close()
 
-# 3. RUTAS DE CLIENTES (Entidad base)
+
 @router.post("/clientes/", response_model=Cliente)
 async def crear_cliente(cliente: ClienteCreate):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificar si ya existe el cliente
+        
         cursor.execute("SELECT id_cliente FROM clientes WHERE correo = %s", 
                       (cliente.correo,))
         if cursor.fetchone():
@@ -166,20 +166,20 @@ async def listar_clientes():
         cursor.close()
         conn.close()
 
-# 4. RUTAS DE PRODUCTOS (Depende de categorías)
+
 @router.post("/productos/", response_model=Producto)
 async def crear_producto(producto: ProductoCreate):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificar si existe la categoría
+        
         cursor.execute("SELECT id_categoria FROM categorias WHERE id_categoria = %s", 
                       (producto.id_categoria,))
         if not cursor.fetchone():
             raise HTTPException(status_code=404, detail="Categoría no encontrada")
         
-        # Verificar si ya existe el producto
+        
         cursor.execute("SELECT id_producto FROM productos WHERE nombre = %s", 
                       (producto.nombre,))
         if cursor.fetchone():
@@ -211,7 +211,7 @@ async def crear_productos_bulk(productos: List[ProductoCreate]):
     try:
         for producto in productos:
             try:
-                # Verificar si existe la categoría
+                
                 cursor.execute("SELECT id_categoria FROM categorias WHERE id_categoria = %s", 
                               (producto.id_categoria,))
                 if not cursor.fetchone():
@@ -250,14 +250,14 @@ async def crear_productos_bulk(productos: List[ProductoCreate]):
         cursor.close()
         conn.close()
 
-# 5. RUTAS DE INVENTARIO (Depende de productos, proveedores y clientes)
+
 @router.post("/inventario/entradas/", response_model=EntradaInventario)
 async def registrar_entrada(entrada: EntradaInventarioCreate):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificaciones previas
+        
         cursor.execute("SELECT id_producto FROM productos WHERE id_producto = %s", 
                       (entrada.id_producto,))
         if not cursor.fetchone():
@@ -268,7 +268,7 @@ async def registrar_entrada(entrada: EntradaInventarioCreate):
         if not cursor.fetchone():
             raise HTTPException(status_code=404, detail="Proveedor no encontrado")
         
-        # Registrar entrada y actualizar stock en una sola transacción
+        
         query_entrada = """
         INSERT INTO entradas_inventario 
         (fecha, id_producto, cantidad, precio_unitario, id_proveedor)
@@ -279,7 +279,7 @@ async def registrar_entrada(entrada: EntradaInventarioCreate):
         
         cursor.execute(query_entrada, values_entrada)
         
-        # Actualizar stock
+        
         cursor.execute("""
             UPDATE productos 
             SET stock = stock + %s 
@@ -298,7 +298,7 @@ async def registrar_salida(salida: SalidaInventarioCreate):
     cursor = conn.cursor(dictionary=True)
     
     try:
-        # Verificar stock disponible
+        
         cursor.execute("SELECT stock FROM productos WHERE id_producto = %s", 
                       (salida.id_producto,))
         producto = cursor.fetchone()
@@ -309,7 +309,7 @@ async def registrar_salida(salida: SalidaInventarioCreate):
         if producto['stock'] < salida.cantidad:
             raise HTTPException(status_code=400, detail="Stock insuficiente")
         
-        # Registrar salida
+        
         query_salida = """
         INSERT INTO salidas_inventario 
         (fecha, id_producto, cantidad, precio_unitario, id_cliente)
@@ -320,7 +320,7 @@ async def registrar_salida(salida: SalidaInventarioCreate):
         
         cursor.execute(query_salida, values_salida)
         
-        # Actualizar stock
+        
         query_update = """
         UPDATE productos 
         SET stock = stock - %s 
@@ -334,7 +334,7 @@ async def registrar_salida(salida: SalidaInventarioCreate):
         cursor.close()
         conn.close()
 
-# 6. RUTAS DE REPORTES (Consultas sobre todas las entidades)
+
 @router.get("/reportes/ventas/", response_model=VentasPorPeriodo)
 async def obtener_reporte_ventas(
     fecha_inicio: datetime,
